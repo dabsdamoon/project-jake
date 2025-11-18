@@ -1,0 +1,21 @@
+name: jake
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - fastapi
+      - uvicorn
+      - openai
+      - python-dotenv
+      - langgraph
+      - langchain-openai
+      - langchain
+      - langchain-core
+      - langchain-mcp-adapters
+      - pydantic
+      - sqlalchemy
+      - chromadb
+      - langchain-community
