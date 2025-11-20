@@ -4,33 +4,51 @@ Complete guide for testing all JAKE API endpoints.
 
 ## 🧪 Available Test Scripts
 
-### 1. Python Test Suite (Comprehensive)
-**File**: `test_api_endpoints.py`
+### Unified Test Runner (Recommended)
+**File**: `run_tests.sh`
 
-Full-featured test suite with:
-- ✅ All 10 endpoint tests
-- ✅ Colored terminal output
-- ✅ Detailed error messages
-- ✅ Test summary report
-- ✅ Progress indicators
+One command to run all tests:
+- ✅ Runs unit tests first (no server needed)
+- ✅ Checks if API server is running
+- ✅ Runs API endpoint tests
+- ✅ Beautiful summary output
+- ✅ Flexible options (unit-only, api-only, custom port)
 
-### 2. Shell Script (Quick Test)
-**File**: `test_api_simple.sh`
+### API Endpoint Tests
+**File**: `tests/test_api_simple.sh`
 
-Quick bash script using curl:
+Shell-based test suite for all 9 API endpoints:
 - ✅ Fast execution
-- ✅ Simple output
-- ✅ No Python dependencies
-- ✅ JSON formatted results
+- ✅ Minimal dependencies (curl + jq)
+- ✅ Tests all endpoints sequentially
+- ✅ Validates responses with error checking
+- ✅ JSON formatted output
+- ✅ Fails fast on errors (exits immediately if API is down)
 
-### 3. Manual Testing
-Using curl commands directly for specific tests.
+### Manual Testing
+Using curl commands directly for specific tests (see below).
 
 ---
 
 ## 🚀 Running Tests
 
-### Prerequisites
+### Quick Start (Unified Test Runner)
+
+```bash
+# Make sure server is running first
+./start_server.sh &
+sleep 10
+
+# Run all tests
+./run_tests.sh
+
+# Or run only specific tests
+./run_tests.sh --unit-only    # No server needed
+./run_tests.sh --api-only     # Requires server
+./run_tests.sh 8001           # Custom port
+```
+
+### Running Individual Test Script
 
 **1. Start the Server**
 ```bash
@@ -39,73 +57,18 @@ Using curl commands directly for specific tests.
 
 # Or with custom port
 ./start_server.sh 8001
-
-# Or manually
-conda activate jake
-uvicorn src.main:app --port 8000
 ```
 
-**2. Server should be running at**: http://localhost:8000 (or your custom port)
-
----
-
-### Method 1: Python Test Suite (Recommended)
-
-```bash
-# Make sure server is running, then:
-python test_api_endpoints.py
-
-# With custom port:
-python test_api_endpoints.py --url http://localhost:8001
-```
-
-**Example Output:**
-```
-======================================================================
-                     JAKE API ENDPOINT TESTS
-======================================================================
-
-Testing API at: http://localhost:8000
-
-🧪 Testing: Health Check (GET /ping)
-✓ Server is healthy: {'status': 'healthy'}
-
-🧪 Testing: Create Character (POST /characters)
-✓ Character created successfully!
-  Character ID: 1
-  Name: Luna
-  Worldview (excerpt): Luna lives in a quaint neighborhood...
-  Personality (excerpt): Warm, caring, slightly shy...
-
-...
-
-======================================================================
-                          TEST SUMMARY
-======================================================================
-
-Total Tests: 10
-Passed: 10
-Failed: 0
-Success Rate: 100.0%
-
-======================================================================
-🎉 All tests passed! JAKE API is working perfectly!
-======================================================================
-```
-
----
-
-### Method 2: Shell Script (Quick)
-
+**2. Run the tests**
 ```bash
 # Requires jq for JSON parsing
 # Install: brew install jq (Mac) or apt-get install jq (Linux)
 
-./test_api_simple.sh        # Default port 8000
-./test_api_simple.sh 8001   # Custom port 8001
+./tests/test_api_simple.sh        # Default port 8000
+./tests/test_api_simple.sh 8001   # Custom port 8001
 ```
 
-**Example Output:**
+**Example Output (Success):**
 ```
 Testing JAKE API at: http://localhost:8000
 
@@ -113,23 +76,44 @@ Test 1: Health Check
 {
   "status": "healthy"
 }
+✓ API is healthy
 
 Test 2: Create Character
 Created Character ID: 1
+Name: Luna
+
+Character Details:
 {
-  "character_id": 1,
-  "name": "Luna",
-  "personality": "Warm, caring, slightly shy..."
+  "personality": "Warm, caring, slightly shy...",
+  "quirks": "Often hums while working, tucks hair behind ear when nervous...",
+  "speaking_style": "Gentle and soft-spoken...",
+  "likes": "Books, rainy days, warm tea...",
+  "dislikes": "Loud noises, confrontation...",
+  "background": "Inherited cafe from grandmother...",
+  "goals": "Create a welcoming space..."
 }
+✓ Character created successfully
 
 ...
 
-✓ All tests completed!
+========================================
+✓ All 9 tests completed successfully!
+========================================
+```
+
+**Example Output (Failure - API not running):**
+```
+Testing JAKE API at: http://localhost:8000
+
+Test 1: Health Check
+❌ FAILED: API is not responding (HTTP 000)
+Make sure the server is running:
+  ./start_server.sh 8000
 ```
 
 ---
 
-### Method 3: Manual cURL Commands
+## Manual cURL Commands
 
 Test individual endpoints:
 

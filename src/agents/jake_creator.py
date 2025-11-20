@@ -3,7 +3,7 @@ JAKECreator: Worker for generating character details based on basic information
 """
 from typing import Dict, Any
 from langchain_openai import ChatOpenAI
-from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
+from langchain_core.output_parsers import StrOutputParser
 from pydantic import BaseModel, Field
 
 from src.prompts import PromptManager
@@ -12,7 +12,7 @@ from src.prompts import PromptManager
 class CharacterDetails(BaseModel):
     """Schema for character details"""
     personality: str = Field(description="Character's personality traits")
-    character: str = Field(description="Character's distinctive characteristics")
+    quirks: str = Field(description="Character's distinctive quirks and mannerisms")
     speaking_style: str = Field(description="Character's way of speaking")
     likes: str = Field(description="Things the character likes")
     dislikes: str = Field(description="Things the character dislikes")
@@ -62,7 +62,7 @@ class JAKECreator:
         self,
         str_worldview: str,
         character_basics: Dict[str, Any]
-    ) -> Dict[str, str]:
+    ) -> CharacterDetails:
         """
         Generate detailed character traits from worldview
 
@@ -71,11 +71,11 @@ class JAKECreator:
             character_basics: Basic character information
 
         Returns:
-            Dictionary with character details: personality, character, speaking_style,
-            likes, dislikes, background, goals
+            CharacterDetails object with validated character details: personality,
+            character, speaking_style, likes, dislikes, background, goals
         """
         details_prompt = self.prompt_manager.get_details_prompt()
-        chain = details_prompt | self.llm | JsonOutputParser()
+        chain = details_prompt | self.llm.with_structured_output(CharacterDetails)
 
         details = chain.invoke({
             "name": character_basics.get("name", "Unknown"),
@@ -106,7 +106,7 @@ class JAKECreator:
         complete_character = {
             "basics": character_basics,
             "worldview": worldview,
-            "details": details,
+            "details": details.model_dump(),  # Convert Pydantic model to dict
             "dynamic_profile": ""  # Will be updated during conversations
         }
 

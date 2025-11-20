@@ -26,7 +26,7 @@ DETAILS_SYSTEM = """You are a character development specialist.
 Based on the worldview and basic information provided, create comprehensive character details.
 Your output must be a JSON object with these exact fields:
 - personality: Key personality traits and temperament
-- character: Distinctive characteristics and quirks
+- quirks: Distinctive quirks, habits, and mannerisms
 - speaking_style: How the character speaks (tone, vocabulary, speech patterns)
 - likes: Things the character enjoys or values
 - dislikes: Things the character avoids or dislikes

@@ -3,7 +3,6 @@ JAKESummarizer: Extracts atomic facts from conversations for memory storage
 """
 from typing import Dict, List
 from langchain_openai import ChatOpenAI
-from langchain_core.output_parsers import JsonOutputParser
 from pydantic import BaseModel, Field
 
 from src.prompts import PromptManager
@@ -76,14 +75,14 @@ class JAKESummarizer:
         formatted_turn = self._extract_facts(last_turn)
 
         memory_prompt = self.prompt_manager.get_memory_extraction_prompt()
-        chain = memory_prompt | self.llm | JsonOutputParser()
+        chain = memory_prompt | self.llm.with_structured_output(MemoryFacts)
 
         memories = chain.invoke({
             "character_name": character_name,
             "conversation_turn": formatted_turn
         })
 
-        return memories
+        return memories.model_dump()  # Convert Pydantic model to dict
 
     def should_run(self, history_length: int) -> bool:
         """

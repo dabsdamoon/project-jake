@@ -66,7 +66,7 @@ Generates detailed character traits based on worldview.
 ```python
 {
     "personality": str,      # Personality traits and temperament
-    "character": str,        # Distinctive characteristics and quirks
+    "quirks": str,          # Distinctive quirks, habits, and mannerisms
     "speaking_style": str,   # Speech patterns, tone, vocabulary
     "likes": str,           # Things character enjoys
     "dislikes": str,        # Things character avoids

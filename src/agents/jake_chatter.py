@@ -3,7 +3,7 @@ JAKEChatter: Agent for running character chats with dialogue, actions, and affec
 """
 from typing import Dict, Any, List, Optional
 from langchain_openai import ChatOpenAI
-from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.messages import HumanMessage, AIMessage
 from pydantic import BaseModel, Field
 
 from src.prompts import PromptManager
@@ -53,8 +53,8 @@ Occupation: {character_basics.get('occupation', 'Unknown')}
 PERSONALITY & TRAITS:
 {character_details.get('personality', 'Not specified')}
 
-DISTINCTIVE CHARACTERISTICS:
-{character_details.get('character', 'Not specified')}
+QUIRKS & MANNERISMS:
+{character_details.get('quirks', 'Not specified')}
 
 SPEAKING STYLE:
 {character_details.get('speaking_style', 'Not specified')}
@@ -81,7 +81,7 @@ GOALS & MOTIVATIONS:
         history: Optional[List[Dict[str, str]]] = None,
         dynamic_profile: str = "",
         current_affection: int = 50
-    ) -> Dict[str, Any]:
+    ) -> ChatResponse:
         """
         Generate chat response with all required outputs
 
@@ -94,7 +94,8 @@ GOALS & MOTIVATIONS:
             current_affection: Current affection score
 
         Returns:
-            Dictionary with dialogue, action, situation, background, affection_score
+            ChatResponse object with validated dialogue, action, situation, background,
+            affection_score, affection_change, and internal_thought
         """
         character_context = self._build_character_context(
             character_basics,
@@ -104,21 +105,24 @@ GOALS & MOTIVATIONS:
 
         chat_prompt = self.prompt_manager.get_chat_prompt()
 
-        # Prepare history in the correct format
+        # Prepare history in the correct format (LangChain message objects)
         formatted_history = []
         if history:
             for turn in history:
                 role = turn.get("role")
                 content = turn.get("content")
                 if role and content:
-                    formatted_history.append((role, content))
+                    if role == "user":
+                        formatted_history.append(HumanMessage(content=content))
+                    elif role == "assistant":
+                        formatted_history.append(AIMessage(content=content))
 
-        chain = chat_prompt | self.llm | JsonOutputParser()
+        chain = chat_prompt | self.llm.with_structured_output(ChatResponse)
 
         response = chain.invoke({
             "character_context": character_context,
             "current_affection": current_affection,
-            "history": formatted_history if formatted_history else None,
+            "history": formatted_history,  # List of LangChain message objects
             "query": query
         })
 
@@ -143,7 +147,7 @@ GOALS & MOTIVATIONS:
         Returns:
             Chat response dictionary
         """
-        return self._chat(
+        response = self._chat(
             query=query,
             character_basics=character.get("basics", {}),
             character_details=character.get("details", {}),
@@ -151,6 +155,7 @@ GOALS & MOTIVATIONS:
             dynamic_profile=character.get("dynamic_profile", ""),
             current_affection=current_affection
         )
+        return response.model_dump()  # Convert Pydantic model to dict
 
 
 # Example usage
@@ -169,7 +174,7 @@ if __name__ == "__main__":
         },
         "details": {
             "personality": "Warm, caring, slightly shy but friendly once comfortable",
-            "character": "Often hums while working, has a habit of tucking hair behind ear when nervous",
+            "quirks": "Often hums while working, has a habit of tucking hair behind ear when nervous",
             "speaking_style": "Gentle and soft-spoken, uses polite language, occasionally hesitant",
             "likes": "Books, rainy days, warm tea, cozy atmospheres",
             "dislikes": "Loud noises, confrontation, rushed situations",
