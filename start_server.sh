@@ -1,7 +1,11 @@
 #!/bin/bash
 # JAKE API Server Startup Script (Conda Version)
 
+# Default port
+PORT="${1:-8000}"
+
 echo "🚀 Starting JAKE API Server..."
+echo "📍 Port: $PORT"
 echo ""
 
 # Check if conda is installed
@@ -50,11 +54,11 @@ python -c "from src.database.connection import init_db; init_db()" 2>/dev/null |
 echo ""
 echo "✅ Setup complete!"
 echo ""
-echo "📡 Starting server on http://localhost:8000"
-echo "📖 API Docs will be available at http://localhost:8000/docs"
+echo "📡 Starting server on http://localhost:$PORT"
+echo "📖 API Docs will be available at http://localhost:$PORT/docs"
 echo ""
 echo "Press Ctrl+C to stop the server"
 echo ""
 
 # Start the server
-python -m src.main
+uvicorn src.main:app --host 0.0.0.0 --port $PORT

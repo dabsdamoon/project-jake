@@ -25,7 +25,7 @@ class JAKECreator:
     Worker for generating character details based on basic information given by users
     """
 
-    def __init__(self, model_name: str = "gpt-4o", temperature: float = 0.7):
+    def __init__(self, model_name: str = "gpt-5-nano", temperature: float = 0.7):
         """
         Initialize JAKECreator
 

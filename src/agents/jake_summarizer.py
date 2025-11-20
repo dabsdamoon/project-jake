@@ -24,12 +24,12 @@ class JAKESummarizer:
     the character and the user for long-term memory storage
     """
 
-    def __init__(self, model_name: str = "gpt-4o-mini", temperature: float = 0.0):
+    def __init__(self, model_name: str = "gpt-5-nano", temperature: float = 0.0):
         """
         Initialize JAKESummarizer
 
         Args:
-            model_name: OpenAI model to use (using mini for cost efficiency)
+            model_name: OpenAI model to use (using nano for cost efficiency)
             temperature: Temperature (0 for consistent extraction)
         """
         self.llm = ChatOpenAI(model=model_name, temperature=temperature)

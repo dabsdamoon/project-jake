@@ -14,7 +14,7 @@ class JAKEChecker:
     quests have been cleared
     """
 
-    def __init__(self, model_name: str = "gpt-4o", temperature: float = 0.0):
+    def __init__(self, model_name: str = "gpt-5-nano", temperature: float = 0.0):
         """
         Initialize JAKEChecker
 

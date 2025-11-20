@@ -59,11 +59,13 @@ PORT=8000
 ### 3. Run the Server
 
 ```bash
-# Option A: Direct Python
-python -m src.main
+# Option A: Using startup script (Recommended)
+./start_server.sh          # Default port 8000
+./start_server.sh 8001     # Custom port 8001
 
 # Option B: Using uvicorn directly
 uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn src.main:app --reload --host 0.0.0.0 --port 8001  # Custom port
 ```
 
 You should see:

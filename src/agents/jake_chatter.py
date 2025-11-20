@@ -26,7 +26,7 @@ class JAKEChatter:
     actions, situation descriptions, and affection tracking
     """
 
-    def __init__(self, model_name: str = "gpt-4o", temperature: float = 0.8):
+    def __init__(self, model_name: str = "gpt-5-nano", temperature: float = 0.8):
         """
         Initialize JAKEChatter
 
