@@ -1,11 +1,58 @@
 """
 JAKEChecker: Agent that checks quest completion status from conversation history
 """
+import ast
+import json
+import re
 from typing import Dict, Any, List
 from langchain_openai import ChatOpenAI
-from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.output_parsers import BaseOutputParser
 
 from src.prompts import PromptManager
+
+
+class RobustJsonOutputParser(BaseOutputParser[Dict[str, Any]]):
+    """
+    Parser that handles both valid JSON and Python dict format output.
+    Falls back to ast.literal_eval when JSON parsing fails.
+    """
+
+    def parse(self, text: str) -> Dict[str, Any]:
+        """Parse LLM output to dict, handling both JSON and Python dict formats."""
+        # Clean up the text - remove markdown code blocks if present
+        text = text.strip()
+        if text.startswith("```"):
+            # Remove ```json or ``` markers
+            text = re.sub(r'^```(?:json)?\s*', '', text)
+            text = re.sub(r'\s*```$', '', text)
+            text = text.strip()
+
+        # Try JSON first
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            pass
+
+        # Try ast.literal_eval for Python dict format
+        try:
+            result = ast.literal_eval(text)
+            if isinstance(result, dict):
+                return result
+        except (ValueError, SyntaxError):
+            pass
+
+        # Last resort: try to find JSON-like structure in the text
+        json_match = re.search(r'\{.*\}', text, re.DOTALL)
+        if json_match:
+            try:
+                return json.loads(json_match.group())
+            except json.JSONDecodeError:
+                try:
+                    return ast.literal_eval(json_match.group())
+                except (ValueError, SyntaxError):
+                    pass
+
+        raise ValueError(f"Could not parse output as JSON or Python dict: {text}")
 
 
 class JAKEChecker:
@@ -52,7 +99,7 @@ class JAKEChecker:
         formatted_history = self._format_history(history)
 
         quest_prompt = self.prompt_manager.get_quest_check_prompt()
-        chain = quest_prompt | self.llm | JsonOutputParser()
+        chain = quest_prompt | self.llm | RobustJsonOutputParser()
 
         updated_quests = chain.invoke({
             "history": formatted_history,
@@ -83,7 +130,7 @@ class JAKEChecker:
         formatted_history = self._format_history(history)
 
         advancement_prompt = self.prompt_manager.get_advancement_check_prompt()
-        chain = advancement_prompt | self.llm | JsonOutputParser()
+        chain = advancement_prompt | self.llm | RobustJsonOutputParser()
 
         updated_quests = chain.invoke({
             "history": formatted_history,
