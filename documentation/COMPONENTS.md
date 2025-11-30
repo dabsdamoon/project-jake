@@ -620,12 +620,65 @@ Removes all memories for a character.
 
 ---
 
-## Documentation Files
+## Prompt Management System
 
-- **PLAN.md** - Detailed process flow and architecture
-- **CHATTING_FLOW.md** - Mermaid diagram of conversation pipeline
-- **PROMPT_MANAGEMENT.md** - Guide for managing prompts
-- **README.md** - Setup and quick start guide
+All prompts are centrally managed in `src/prompts/` for easy maintenance and version control.
+
+### Structure
+
+```
+src/prompts/
+├── __init__.py
+├── prompt_manager.py          # Central prompt manager
+├── creator_prompts.py         # JAKECreator prompts
+├── chatter_prompts.py         # JAKEChatter prompts
+├── checker_prompts.py         # JAKEChecker prompts
+├── profiler_prompts.py        # JAKEDynamicProfiler prompts
+└── summarizer_prompts.py      # JAKESummarizer prompts
+```
+
+### Usage in Agent Classes
+
+```python
+from src.prompts import PromptManager
+
+class MyAgent:
+    def __init__(self):
+        self.llm = ChatOpenAI(...)
+        self.prompt_manager = PromptManager()
+
+    def some_method(self):
+        prompt = self.prompt_manager.get_chat_prompt()
+        chain = prompt | self.llm | parser
+        result = chain.invoke(params)
+```
+
+### Available Prompts
+
+| Agent | Method | Purpose |
+|-------|--------|---------|
+| JAKECreator | `get_worldview_prompt()` | Generate character worldview |
+| JAKECreator | `get_details_prompt()` | Generate character details |
+| JAKEChatter | `get_chat_prompt()` | Generate conversational responses |
+| JAKEChecker | `get_quest_check_prompt()` | Check regular quest completion |
+| JAKEChecker | `get_advancement_check_prompt()` | Check advancement quest completion |
+| JAKEDynamicProfiler | `get_dynamic_profile_prompt()` | Generate profile updates |
+| JAKESummarizer | `get_memory_extraction_prompt()` | Extract atomic facts |
+
+### Modifying Prompts
+
+1. Navigate to the appropriate prompt file (e.g., `chatter_prompts.py`)
+2. Edit the prompt constant (e.g., `CHAT_SYSTEM`)
+3. Save the file
+4. Changes are automatically picked up by all agents
+
+### Best Practices
+
+1. **Keep prompts focused**: Each prompt should have a single, clear purpose
+2. **Use descriptive placeholders**: Make variables obvious (e.g., `{character_context}`)
+3. **Document expectations**: Add comments explaining expected output
+4. **Test changes**: Verify prompt modifications work as expected
+5. **Version control**: Use git to track significant prompt updates
 
 ---
 
@@ -644,4 +697,6 @@ Tests all components independently and the full orchestrator:
 ```bash
 python test_jake.py
 ```
+
+See [TESTING.md](./TESTING.md) for comprehensive API testing guide.
 

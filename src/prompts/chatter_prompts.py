@@ -2,6 +2,35 @@
 Prompts for JAKEChatter - Conversation generation prompts
 """
 
+# Character context template
+CHARACTER_CONTEXT_TEMPLATE = """CHARACTER PROFILE:
+Name: {name}
+Age: {age}
+Occupation: {occupation}
+
+PERSONALITY & TRAITS:
+{personality}
+
+QUIRKS & MANNERISMS:
+{quirks}
+
+SPEAKING STYLE:
+{speaking_style}
+
+LIKES: {likes}
+DISLIKES: {dislikes}
+
+BACKGROUND:
+{background}
+
+GOALS & MOTIVATIONS:
+{goals}"""
+
+CHARACTER_CONTEXT_DYNAMIC_SUFFIX = """
+
+DYNAMIC UPDATES (from recent interactions):
+{dynamic_profile}"""
+
 # Chat generation prompt
 CHAT_SYSTEM = """You are roleplaying as the character described below. Stay in character at all times.
 

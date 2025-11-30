@@ -450,6 +450,6 @@ Current coverage:
 ---
 
 **For more details, see:**
-- [GETTING_STARTED.md](./GETTING_STARTED.md) - Setup guide
-- [API_CONNECTION_GUIDE.md](./API_CONNECTION_GUIDE.md) - API architecture
+- [README.md](./README.md) - Setup guide
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - System architecture
 - [COMPONENTS.md](./COMPONENTS.md) - Component specifications

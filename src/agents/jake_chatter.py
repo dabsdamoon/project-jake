@@ -44,32 +44,23 @@ class JAKEChatter:
         dynamic_profile: str = ""
     ) -> str:
         """Build comprehensive character context for the prompt"""
-        context = f"""
-CHARACTER PROFILE:
-Name: {character_basics.get('name', 'Unknown')}
-Age: {character_basics.get('age', 'Unknown')}
-Occupation: {character_basics.get('occupation', 'Unknown')}
+        template = self.prompt_manager.get_character_context_template()
+        context = template.format(
+            name=character_basics.get('name', 'Unknown'),
+            age=character_basics.get('age', 'Unknown'),
+            occupation=character_basics.get('occupation', 'Unknown'),
+            personality=character_details.get('personality', 'Not specified'),
+            quirks=character_details.get('quirks', 'Not specified'),
+            speaking_style=character_details.get('speaking_style', 'Not specified'),
+            likes=character_details.get('likes', 'Not specified'),
+            dislikes=character_details.get('dislikes', 'Not specified'),
+            background=character_details.get('background', 'Not specified'),
+            goals=character_details.get('goals', 'Not specified')
+        )
 
-PERSONALITY & TRAITS:
-{character_details.get('personality', 'Not specified')}
-
-QUIRKS & MANNERISMS:
-{character_details.get('quirks', 'Not specified')}
-
-SPEAKING STYLE:
-{character_details.get('speaking_style', 'Not specified')}
-
-LIKES: {character_details.get('likes', 'Not specified')}
-DISLIKES: {character_details.get('dislikes', 'Not specified')}
-
-BACKGROUND:
-{character_details.get('background', 'Not specified')}
-
-GOALS & MOTIVATIONS:
-{character_details.get('goals', 'Not specified')}
-"""
         if dynamic_profile:
-            context += f"\n\nDYNAMIC UPDATES (from recent interactions):\n{dynamic_profile}"
+            dynamic_suffix = self.prompt_manager.get_character_context_dynamic_suffix()
+            context += dynamic_suffix.format(dynamic_profile=dynamic_profile)
 
         return context
 

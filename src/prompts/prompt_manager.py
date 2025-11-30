@@ -60,6 +60,18 @@ class PromptManager:
             ("user", CHAT_USER)
         ])
 
+    @staticmethod
+    def get_character_context_template() -> str:
+        """Get template for character context"""
+        from .chatter_prompts import CHARACTER_CONTEXT_TEMPLATE
+        return CHARACTER_CONTEXT_TEMPLATE
+
+    @staticmethod
+    def get_character_context_dynamic_suffix() -> str:
+        """Get dynamic suffix template for character context"""
+        from .chatter_prompts import CHARACTER_CONTEXT_DYNAMIC_SUFFIX
+        return CHARACTER_CONTEXT_DYNAMIC_SUFFIX
+
     # ============================================
     # JAKEChecker Prompts
     # ============================================
